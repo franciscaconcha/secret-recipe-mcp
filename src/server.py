@@ -10,6 +10,7 @@ from pydantic import Field
 
 from allergens import MAJOR_ALLERGENS, build_dish_allergens, normalise_allergen
 from audit import AuditLog
+from leak_filter import LeakFilter, load_canaries
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = PROJECT_DIR / "data"
@@ -26,10 +27,16 @@ DISH_ALLERGENS = build_dish_allergens(PUBLIC_MENU, CONFIDENTIAL_RECIPE)
 
 mcp = FastMCP("Recipe allergens")
 
-# Every tool call passes through this middleware on its way in and out.
-# The path is fixed to the project folder, not the client's working directory.
+# Every tool call passes through the middleware on its way in and out. The
+# first one added is the outermost layer:
+#
+#   client -> AuditLog -> LeakFilter -> tool -> LeakFilter -> AuditLog -> client
+#
+# so the audit log records what the client actually received, after filtering.
+# The log path is fixed to the project folder, not the client's working directory.
 audit_log = AuditLog(PROJECT_DIR / "logs" / "audit.jsonl")
 mcp.add_middleware(audit_log)
+mcp.add_middleware(LeakFilter(load_canaries(DATA_DIR / "canaries.txt")))
 
 
 # A resource is read-only data the client can fetch by URI. Its name and
