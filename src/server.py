@@ -22,5 +22,13 @@ DISH_ALLERGENS = build_dish_allergens(PUBLIC_MENU, CONFIDENTIAL_RECIPE)
 mcp = FastMCP("Recipe allergens")
 
 
+# A resource is read-only data the client can fetch by URI. Its name and
+# docstring (used as the description) are sent to the client.
+@mcp.resource("menu://public", mime_type="text/markdown")
+def public_menu() -> str:
+    """The public menu: dishes, descriptions, allergens and flavour."""
+    return PUBLIC_MENU
+
+
 if __name__ == "__main__":
     mcp.run()  # stdio transport by default
