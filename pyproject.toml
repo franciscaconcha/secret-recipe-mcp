@@ -10,4 +10,11 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=9.2.0",
+    "pytest-asyncio>=1.5.0",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]      # so tests can `import server`, like `uv run src/server.py` does
+testpaths = ["tests"]
+asyncio_mode = "auto"     # run `async def` tests without a decorator on each one
+asyncio_default_fixture_loop_scope = "function"
