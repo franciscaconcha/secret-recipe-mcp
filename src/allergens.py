@@ -97,17 +97,21 @@ def parse_recipe(text: str) -> list[str]:
     return ingredients
 
 
-def parse_public_allergens(text: str) -> set[str]:
-    """Read the 'Allergens: ...' line from the public menu."""
+def parse_public_allergens(text: str) -> dict[str, str]:
+    """Read the 'Allergens: ...' line from the public menu.
+
+    Returns {standard name: word used on the menu}, in menu order,
+    e.g. {"milk": "dairy"}.
+    """
     match = re.search(r"^Allergens:(.*)$", text, re.IGNORECASE | re.MULTILINE)
     if not match:
         raise ValueError("public.md: no 'Allergens:' line")
-    allergens = set()
+    allergens = {}
     for word in match[1].split(","):
         allergen = normalise_allergen(word)
         if allergen is None:
             raise ValueError(f"public.md: {word.strip()!r} isn't a major allergen")
-        allergens.add(allergen)
+        allergens[allergen] = word.strip()
     return allergens
 
 
@@ -124,6 +128,7 @@ def compute_allergens(ingredients: list[str]) -> set[str]:
 def build_dish_allergens(public_md: str, confidential_md: str) -> dict[str, list[str]]:
     """Compute each dish's allergens and check them against the public menu.
 
+    Returns {dish: allergens}, in the menu's words and order.
     Raises ValueError if anything doesn't line up, so the server refuses
     to start rather than give a wrong allergen answer.
     """
@@ -143,10 +148,11 @@ def build_dish_allergens(public_md: str, confidential_md: str) -> dict[str, list
         for component in components:
             ingredients += sauce if component == "house sauce" else [component]
         computed = compute_allergens(ingredients)
-        if computed != published:
+        if computed != set(published):
             raise ValueError(
                 f"{dish}: computed allergens {sorted(computed)} "
                 f"don't match the public menu {sorted(published)}"
             )
-        result[dish] = sorted(computed)
+        # They match, so answer in the words customers see on the menu.
+        result[dish] = list(published.values())
     return result
