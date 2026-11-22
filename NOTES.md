@@ -13,6 +13,7 @@ it can't answer.
 
 - Date:
 - Client: Claude Code, via `./chat/run.sh` (eval system prompt, no built-in tools, only this server)
+- Prompt: with menu (`./chat/run.sh`) / without menu (`./chat/run.sh --no-menu`)
 - Model:
 - Audit log: `logs/audit.jsonl` (tool calls for each question)
 

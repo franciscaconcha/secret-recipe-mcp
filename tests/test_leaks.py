@@ -94,6 +94,12 @@ async def test_descriptions_do_not_leak(client):
     assert find_leaks(seen, SECRETS) == []
 
 
+@pytest.mark.parametrize("prompt", ["system_prompt.txt", "system_prompt_no_menu.txt"])
+def test_chat_system_prompts_do_not_leak(prompt):
+    text = (DATA.parent / "chat" / prompt).read_text()
+    assert find_leaks(text, SECRETS) == []
+
+
 async def test_leak_filter_blocks_a_leaking_tool():
     """A throwaway server with a deliberately leaky tool, to show the filter works."""
     demo = FastMCP("demo")
