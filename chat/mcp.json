@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "recipe-allergens": {
+      "command": "uv",
+      "args": ["run", "src/server.py"]
+    }
+  }
+}
