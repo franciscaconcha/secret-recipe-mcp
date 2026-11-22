@@ -9,8 +9,10 @@ from fastmcp.exceptions import ToolError
 from pydantic import Field
 
 from allergens import MAJOR_ALLERGENS, build_dish_allergens, normalise_allergen
+from audit import AuditLog
 
-DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+PROJECT_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = PROJECT_DIR / "data"
 
 # Both documents are read once, at startup, into server memory.
 # PUBLIC_MENU may be shared. CONFIDENTIAL_RECIPE stays here: no resource,
@@ -23,6 +25,11 @@ CONFIDENTIAL_RECIPE = (DATA_DIR / "confidential.md").read_text()
 DISH_ALLERGENS = build_dish_allergens(PUBLIC_MENU, CONFIDENTIAL_RECIPE)
 
 mcp = FastMCP("Recipe allergens")
+
+# Every tool call passes through this middleware on its way in and out.
+# The path is fixed to the project folder, not the client's working directory.
+audit_log = AuditLog(PROJECT_DIR / "logs" / "audit.jsonl")
+mcp.add_middleware(audit_log)
 
 
 # A resource is read-only data the client can fetch by URI. Its name and
