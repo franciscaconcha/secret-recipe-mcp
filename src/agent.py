@@ -48,16 +48,19 @@ async def log_tool_call(ctx, call_tool, name, args):
     return result
 
 
-def make_server() -> MCPToolset:
+def make_server(connect_to=None) -> MCPToolset:
     """The recipe MCP server, started as a subprocess with this venv's Python.
 
     Its stderr goes to logs/server.log, so it doesn't mix with the chat.
+    Tests pass the FastMCP server object as `connect_to` to connect in memory
+    instead, like `Client(server.mcp)` in tests/conftest.py.
     """
-    SERVER_LOG.parent.mkdir(exist_ok=True)
-    transport = PythonStdioTransport(
-        SERVER_SCRIPT, cwd=str(PROJECT_DIR), python_cmd=sys.executable, log_file=SERVER_LOG
-    )
-    return MCPToolset(transport, process_tool_call=log_tool_call)
+    if connect_to is None:
+        SERVER_LOG.parent.mkdir(exist_ok=True)
+        connect_to = PythonStdioTransport(
+            SERVER_SCRIPT, cwd=str(PROJECT_DIR), python_cmd=sys.executable, log_file=SERVER_LOG
+        )
+    return MCPToolset(connect_to, process_tool_call=log_tool_call)
 
 
 def build_agent(model, server: MCPToolset) -> Agent:
