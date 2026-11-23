@@ -15,7 +15,7 @@ replies lied ("I don't have that information").
 
 This project tries the opposite design. It implements an MCP server with tools to find the allergen information. The model does not have access to the confidential recipes at all. This works as an extension of [cheating-evals](https://github.com/franciscaconcha/cheating-evals) both to compare the different behaviours and to teach myself how to build my own MCP server.
 
-## Design: guardrails in code, not in the prompt
+## Design: the model never sees the secret
 
 The server loads the recipe at startup and keeps it in memory. No tool,
 resource or description ever returns it. Instead of trusting the model to
@@ -25,7 +25,7 @@ the recipe in plain Python and checked against the public menu: the server
 refuses to start if they disagree, or if an ingredient has no allergen mapping.
 `contains_allergen` only answers for the UK's 14 major allergens. For anything
 else it gives the same refusal, so it never confirms or denies an ingredient.
-As a backstop, a middleware blocks any response that contains a secret word,
+As a backstop guardrail, a middleware blocks any response that contains a secret word,
 and another logs every tool call to `logs/audit.jsonl`.
 
 ## What the model can use
