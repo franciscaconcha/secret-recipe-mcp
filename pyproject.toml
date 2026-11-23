@@ -19,3 +19,4 @@ pythonpath = ["src"]      # so tests can `import server`, like `uv run src/serve
 testpaths = ["tests"]
 asyncio_mode = "auto"     # run `async def` tests without a decorator on each one
 asyncio_default_fixture_loop_scope = "function"
+markers = ["live: calls a real model; skipped unless ANTHROPIC_API_KEY is set"]

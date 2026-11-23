@@ -31,16 +31,28 @@ tools for every answer, and don't guess. If a question isn't about allergens,
 politely say you can only help with allergen questions."""
 
 
+def as_text(result):
+    """Turn a list of words into one string: ["egg", "sesame"] -> "egg, sesame".
+
+    Pydantic AI sends each item of a list result to Claude as a separate text
+    block, and Claude reads the blocks run together ("eggsesame").
+    """
+    if isinstance(result, list) and all(isinstance(item, str) for item in result):
+        return ", ".join(result)
+    return result
+
+
 async def log_tool_call(ctx, call_tool, name, args):
     """Print each tool call and its result to stderr, then pass the result on.
 
     Pydantic AI calls this instead of calling the tool directly; `call_tool`
     is the real call. Errors are logged and re-raised, so the agent still
-    handles them as usual.
+    handles them as usual. List results are joined into one string first
+    (see `as_text`).
     """
     print(f"[tool] {name}({json.dumps(args)})", file=sys.stderr)
     try:
-        result = await call_tool(name, args)
+        result = as_text(await call_tool(name, args))
     except Exception as error:
         print(f"[tool] !! {error}", file=sys.stderr)
         raise
