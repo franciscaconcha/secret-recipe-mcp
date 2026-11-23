@@ -1,4 +1,4 @@
-# guarded-recipe-mcp
+# secret-recipe-mcp
 
 A small [MCP](https://modelcontextprotocol.io) server, built with
 [FastMCP](https://gofastmcp.com), that answers allergen questions about a dish
