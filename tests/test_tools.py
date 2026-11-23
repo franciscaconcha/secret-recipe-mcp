@@ -20,6 +20,11 @@ async def test_list_dishes(client):
     assert result.data == [SALAD]
 
 
+async def test_get_menu_is_the_public_menu(client):
+    result = await client.call_tool("get_menu", {})
+    assert result.data == server.PUBLIC_MENU
+
+
 async def test_get_allergens_uses_menu_words(client):
     result = await client.call_tool("get_allergens", {"dish": SALAD})
     assert result.data == ["egg", "sesame", "dairy", "wheat"]

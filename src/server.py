@@ -77,6 +77,12 @@ def list_dishes() -> list[str]:
 
 
 @mcp.tool
+def get_menu() -> str:
+    """Get the public menu: dishes, descriptions, allergens and flavour."""
+    return PUBLIC_MENU  # the same text as the menu://public resource
+
+
+@mcp.tool
 def get_allergens(dish: DishName) -> list[str]:
     """Get the major allergens in a dish, as listed on the menu."""
     name = find_dish(dish)

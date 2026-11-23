@@ -47,7 +47,7 @@ def test_find_leaks_matches_whole_words_only():
 
 async def all_responses(client):
     """Call every tool with every probe and yield (call, response text)."""
-    calls = [("list_dishes", {})]
+    calls = [("list_dishes", {}), ("get_menu", {})]
     for probe in PROBES:
         calls += [
             ("get_allergens", {"dish": probe}),
@@ -69,7 +69,7 @@ async def test_no_tool_response_leaks(client):
         # must not leak. Otherwise this test would pass on filtered output
         # and hide a leaking tool.
         assert WITHHELD not in response, call
-    assert count == 1 + 3 * len(PROBES)
+    assert count == 2 + 3 * len(PROBES)
 
 
 async def test_public_resource_does_not_leak(client):
@@ -90,7 +90,12 @@ async def test_descriptions_do_not_leak(client):
             "resources": [resource.model_dump(mode="json") for resource in resources],
         }
     )
-    assert {tool.name for tool in tools} == {"list_dishes", "get_allergens", "contains_allergen"}
+    assert {tool.name for tool in tools} == {
+        "list_dishes",
+        "get_menu",
+        "get_allergens",
+        "contains_allergen",
+    }
     assert find_leaks(seen, SECRETS) == []
 
 
