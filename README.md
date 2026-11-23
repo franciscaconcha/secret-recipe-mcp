@@ -11,8 +11,9 @@ In [cheating-evals](https://github.com/franciscaconcha/cheating-evals)
 chatbot had a confidential recipe in its system prompt and was told to share
 only allergen information. Models never leaked the recipe outright, but details
 slipped out in honest refusals ("I can't say what *oil* it uses"), and some
-replies lied ("I don't have that information"). This project tries the
-opposite design.
+replies lied ("I don't have that information"). 
+
+This project tries the opposite design. It implements an MCP server with tools to find the allergen information. The model does not have access to the confidential recipes at all. This works as an extension of [cheating-evals](https://github.com/franciscaconcha/cheating-evals) both to compare the different behaviours and to teach myself how to build my own MCP server.
 
 ## Design: guardrails in code, not in the prompt
 
